@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>图书馆座位预约 - 登录</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Microsoft YaHei", sans-serif;
+    }
+    body {
+      background-color: #f5f7fa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .login-box {
+      background: #fff;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      width: 350px;
+      text-align: center;
+    }
+    .login-box h2 {
+      margin-bottom: 30px;
+      color: #333;
+    }
+    .login-box .form-item {
+      margin: 15px 0;
+      text-align: left;
+    }
+    .login-box label {
+      display: block;
+      margin-bottom: 5px;
+      color: #666;
+    }
+    .login-box input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    .login-box button {
+      width: 100%;
+      padding: 12px;
+      background-color: #409eff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+    .login-box button:hover {
+      background-color: #66b1ff;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h2>图书馆座位预约</h2>
+    <div class="form-item">
+      <label>用户名</label>
+      <input type="text" id="username" placeholder="请输入用户名">
+    </div>
+    <div class="form-item">
+      <label>密码</label>
+      <input type="password" id="password" placeholder="请输入密码">
+    </div>
+    <button onclick="login()">登录</button>
+    <button onclick="alert('注册功能暂未开放')">注册</button>
+  </div>
+
+  <script>
+  function login() {
+    const username = document.getElementById('username').value.trim()
+    const password = document.getElementById('password').value.trim()
+
+    if (!username || !password) {
+        alert('账号和密码不能为空！')
+        return
+    }
+
+    // --- 重点修改部分开始 ---
+    // 保存假token、用户名和用户ID（这里用1当测试ID，实际项目要从后端接口返回）
+    localStorage.setItem('token', 'fake-token-' + Date.now())
+    localStorage.setItem('user', JSON.stringify({ username }))
+    // 新增：保存用户ID（测试用1，和你后端接口里的user_id对应）
+    localStorage.setItem('userId', '1')
+    // --- 重点修改部分结束 ---
+
+    alert('登录成功！正在跳转...')
+    // 跳转到座位大厅页
+    window.location.href = 'index.html'
+  }
+  </script>
+</body>
+</html>

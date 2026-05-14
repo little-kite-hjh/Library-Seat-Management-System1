@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>我的预约</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Microsoft YaHei}
+body{background:#f5f7fa}
+.navbar{background:#333;color:#fff;padding:12px 20px;display:flex;justify-content:space-between;align-items:center}
+.navbar a{color:#fff;text-decoration:none;margin-left:20px}
+.container{max-width:700px;margin:30px auto;padding:0 20px}
+.container h3{text-align:center;margin-bottom:20px}
+.reserve-item{background:#fff;padding:15px;border-radius:8px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.reserve-info p{margin:4px 0}
+.countdown{color:#f56c6c;font-weight:bold}
+.cancel{padding:8px 14px;background:#f56c6c;color:#fff;border:none;border-radius:4px;cursor:pointer}
+.cancel:disabled{background:#ccc}
+.empty{text-align:center;padding:40px;color:#999}
+</style>
+</head>
+<body>
+<div class="navbar">
+<span>座位预约系统</span>
+<div>
+<a href="index.html">座位大厅</a>
+<a href="my.html" style="color:#409eff">我的预约</a>
+<a href="javascript:logout()">退出登录</a>
+</div>
+</div>
+<div class="container">
+<h3>我的预约</h3>
+<div id="reserveList"></div>
+</div>
+
+<script type="module">
+// 注意：这里的名字必须和 api.js 里 export 的名字一模一样
+import { getMyReserves, cancelReserve } from './api.js';
+
+// 后面的渲染代码不变
+async function renderList(){
+  try{
+    let res = await getMyReserves();
+    let el = document.getElementById('reserveList');
+    if(res.code!==200){
+      el.innerHTML='<div class="empty">加载失败：'+res.msg+'</div>';
+      return;
+    }
+    let list = res.data;
+    if(list.length===0){
+      el.innerHTML='<div class="empty">暂无预约</div>';
+      return;
+    }
+    el.innerHTML='';
+    list.forEach(item=>{
+      let expired = new Date(item.end_time) < new Date();
+      let div = document.createElement('div');
+      div.className='reserve-item';
+      div.innerHTML = `
+        <div class="reserve-info">
+          <p>座位：${item.room_name}-${item.seat_number}</p >
+          <p>到期：${new Date(item.end_time).toLocaleString()}</p >
+          <p class="countdown">${expired ? '已过期' : '预约中'}</p >
+        </div>
+        <button class="cancel" data-id="${item.reservation_id}" ${expired ? 'disabled' : ''}>
+          ${expired ? '已过期' : '取消预约'}
+        </button>
+      `;
+      el.appendChild(div);
+    });
+
+    document.querySelectorAll('.cancel:not([disabled])').forEach(btn=>{
+      btn.onclick = async function(){
+        let id = this.dataset.id;
+        if(!confirm('确定要取消预约吗？')) return;
+        let res = await cancelReserve(id);
+        if(res.code===200){
+          alert('取消成功！');
+          location.reload();
+        }else{
+          alert('取消失败：'+res.msg);
+        }
+      }
+    });
+  }catch(e){
+    console.error(e);
+    document.getElementById('reserveList').innerHTML='<div class="empty">加载出错了</div>';
+  }
+}
+
+renderList();
+</script>
+</body>
+</html>

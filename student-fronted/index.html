@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>座位大厅</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "微软雅黑", sans-serif;
+        }
+        body {
+            padding: 20px;
+        }
+        .navbar {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        .navbar a {
+            text-decoration: none;
+            color: #333;
+            margin: 0 10px;
+        }
+        .status-info {
+            margin-bottom: 15px;
+        }
+        .status-item {
+            display: inline-block;
+            margin-right: 20px;
+        }
+        .status-color {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            margin-right: 5px;
+        }
+        .status-color.green { background-color: #4CAF50; }
+        .status-color.red { background-color: #f44336; }
+        .status-color.gray { background-color: #9E9E9E; }
+        .refresh-btn {
+            padding: 6px 12px;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+        .seat-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .seat {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .available { background-color: #4CAF50; }
+        .reserved { background-color: #f44336; }
+        .maintaining { background-color: #9E9E9E; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <span>座位预约系统</span>
+        <a href=" ">座位大厅</a >
+        <a href="my.html">我的预约</a >
+        <a href="javascript:logout()">退出登录</a >
+    </div>
+
+    <div class="status-info">
+        <div class="status-item"><span class="status-color green"></span>可预约</div>
+        <div class="status-item"><span class="status-color red"></span>已预约</div>
+        <div class="status-item"><span class="status-color gray"></span>维护中</div>
+    </div>
+
+    <button class="refresh-btn" onclick="refreshSeats()">刷新座位状态</button>
+
+    <div class="seat-container" id="seatArea"></div>
+
+    <!-- 所有JS逻辑都写在这里，不需要外部文件！ -->
+    <script>
+    const userId = 1;
+
+    // 从后端获取座位并渲染所有状态的座位
+    async function loadSeats() {
+        const res = await fetch('http://127.0.0.1:5000/seats');
+        const result = await res.json();
+        const seats = result.data;
+
+        const seatArea = document.getElementById('seatArea');
+        seatArea.innerHTML = '';
+
+        seats.forEach(seat => {
+            const div = document.createElement('div');
+            // 修正：用双引号+字符串拼接，不用反引号，避免语法错误
+            div.className = 'seat ' + seat.status;
+            div.textContent = seat.seat_number;
+            div.dataset.seatId = seat.id;
+
+            // 只有可预约的座位才绑定点击事件
+            if (seat.status === 'available') {
+                div.addEventListener('click', async function() {
+                    if (confirm('确认预约 ' + seat.seat_number + ' 吗？')) {
+                        const res = await fetch('http://127.0.0.1:5000/reserve', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                seat_id: seat.id,
+                                user_id: userId
+                            })
+                        });
+                        const data = await res.json();
+                        if (data.code === 200) {
+                            alert('预约成功！');
+                            loadSeats(); // 刷新座位状态
+                        } else {
+                            alert('预约失败：' + data.msg);
+                        }
+                    }
+                });
+            }
+
+            seatArea.appendChild(div);
+        });
+    }
+
+    // 刷新座位状态按钮
+    function refreshSeats() {
+        loadSeats();
+    }
+
+    // 导航和登录函数
+    function goIndex() {
+        location.href = 'index.html';
+    }
+    function logout() {
+        localStorage.clear();
+        location.href = 'login.html';
+    }
+
+    // 页面加载完成后自动渲染所有座位
+    document.addEventListener('DOMContentLoaded', function() {
+        localStorage.setItem('token', 'test_token');
+        localStorage.setItem('userId', '1');
+        loadSeats();
+    });
+</script>
+</body>
+</html>

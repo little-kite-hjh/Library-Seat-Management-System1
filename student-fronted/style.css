@@ -1,0 +1,154 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Microsoft YaHei", sans-serif;
+}
+
+/* 登录页样式 */
+.login-body {
+  background-color: #f5f7fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+.login-box {
+  background: #fff;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  width: 350px;
+  text-align: center;
+}
+.login-box h2 {
+  margin-bottom: 30px;
+  color: #333;
+}
+.login-box input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+}
+.login-box button {
+  width: 100%;
+  padding: 12px;
+  background-color: #409eff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 10px;
+}
+.login-box button:hover {
+  background-color: #66b1ff;
+}
+.login-box p {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #666;
+}
+
+/* 导航栏 */
+.navbar {
+  background-color: #409eff;
+  color: #fff;
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.nav-title {
+  font-size: 18px;
+  font-weight: bold;
+}
+.nav-links a {
+  color: #fff;
+  text-decoration: none;
+  margin-left: 20px;
+  font-size: 15px;
+}
+.nav-links a:hover, .nav-links a.active {
+  border-bottom: 2px solid #fff;
+  padding-bottom: 3px;
+}
+
+/* 容器 */
+.container {
+  max-width: 800px;
+  margin: 30px auto;
+  padding: 0 20px;
+}
+.container h3 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* 座位布局 */
+.seat-container {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 12px;
+}
+.seat {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.seat:hover {
+  transform: scale(1.05);
+}
+.available {
+  background-color: #67c23a;
+}
+.reserved {
+  background-color: #f56c6c;
+  cursor: not-allowed;
+}
+.maintain {
+  background-color: #909399;
+  cursor: not-allowed;
+}
+
+/* 我的预约列表 */
+.reserve-list {
+  margin-top: 20px;
+}
+.reserve-item {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.reserve-item p {
+  margin: 3px 0;
+  color: #555;
+}
+.reserve-item button {
+  padding: 8px 15px;
+  background-color: #f56c6c;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.reserve-item button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
