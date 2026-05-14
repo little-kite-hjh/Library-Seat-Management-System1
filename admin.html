@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<title>管理后台</title>
+<link rel="stylesheet" href="style.css">
+<div class="nav">
+    <h2>管理后台</h2>
+    <div>
+        <button onclick="show('class')">教室管理</button>
+        <button onclick="show('reserve')">预约审核</button>
+        <button onclick="exportData()">导出记录</button>
+        <button onclick="logout()">退出</button>
+    </div>
+</div>
+<div class="container" id="app"></div>
+<script>
+const API = "http://127.0.0.1:8000";
+if (localStorage.role !== "admin") location.href = "login.html";
+
+async function classrooms() {
+    let rs = await (await fetch(API+"/classrooms")).json();
+    let html = `<h3>教室管理</h3><div class="grid">`;
+    rs.forEach(r => {
+        html += `<div class="card"><h4>${r.name}</h4><p>${r.location} | ${r.capacity}人 | ${r.device}</p></div>`;
+    });
+    app.innerHTML = html + "</div>";
+}
+
+async function reserves() {
+    let rs = await (await fetch(API+"/admin/reserves")).json();
+    let html = `<h3>预约审核</h3>`;
+    rs.forEach(r => {
+        html += `
+        <div class="card">
+            用户：${r.user_id} | 教室：${r.classroom_id} | ${r.date} ${r.time_slot} | ${r.status}
+            <button onclick="audit(${r.id},'approved')">通过</button>
+            <button onclick="audit(${r.id},'rejected')">拒绝</button>
+            <button onclick="black(${r.user_id})">拉黑</button>
+        </div>`;
+    });
+    app.innerHTML = html;
+}
+
+async function audit(id, status) {
+    await fetch(API+`/admin/audit?id=${id}&status=${status}`, {method:"POST"});
+    alert("审核完成"); reserves();
+}
+
+async function black(uid) {
+    await fetch(API+`/admin/black?uid=${uid}`, {method:"POST"});
+    alert("操作成功"); reserves();
+}
+
+function exportData() { window.open(API+"/admin/export"); }
+function show(p) { p === "class" ? classrooms() : reserves(); }
+function logout() { localStorage.clear(); location.href = "login.html"; }
+show("reserve");
+</script>

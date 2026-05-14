@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图书馆教室预约系统 - 登录</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="page">
+        <div class="login-card">
+            <h2>📚 图书馆教室预约</h2>
+            <input id="user" placeholder="学号">
+            <input id="pwd" type="password" placeholder="密码">
+            <button onclick="login()">登录</button>
+            <button onclick="register()">注册账号</button>
+        </div>
+    </div>
+
+    <script>
+        const API = "http://127.0.0.1:8000";
+        async function login() {
+            const username = document.getElementById("user").value;
+            const password = document.getElementById("pwd").value;
+
+            try {
+                const response = await fetch(API + "/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await response.json();
+
+                if (response.ok && data.token) {
+                    localStorage.token = data.token;
+                    localStorage.uid = data.uid;
+                    localStorage.role = data.role;
+                    alert("登录成功！");
+                    location.href = data.role === "admin" ? "admin.html" : "index.html";
+                } else {
+                    alert(data.detail || "登录失败，请检查账号密码");
+                }
+            } catch (error) {
+                alert("网络错误，请检查后端是否启动");
+                console.error(error);
+            }
+        }
+
+        function register() {
+            location.href = "register.html";
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<title>用户预约中心</title>
+<link rel="stylesheet" href="style.css">
+<div class="nav">
+    <h2>用户预约中心</h2>
+    <div>
+        <button onclick="show('book')">预约教室</button>
+        <button onclick="show('my')">我的预约</button>
+        <button onclick="logout()">退出</button>
+    </div>
+</div>
+<div class="container" id="app"></div>
+<script>
+const API = "http://127.0.0.1:8000";
+const uid = localStorage.uid;
+if (!uid) location.href = "login.html";
+
+async function loadRooms() {
+    let rs = await (await fetch(API+"/classrooms")).json();
+    let html = `<h3>可预约教室</h3><div class="grid">`;
+    rs.forEach(r => {
+        html += `
+        <div class="room-card">
+            <h4>${r.name}</h4>
+            <p>位置：${r.location}</p>
+            <p>容量：${r.capacity}人</p>
+            <p>设备：${r.device}</p>
+            <button onclick="reserve(${r.id})">立即预约</button>
+        </div>`;
+    });
+    app.innerHTML = html + "</div>";
+}
+
+async function reserve(cid) {
+    let date = prompt("日期（2025-12-25）");
+    let slot = prompt("时段：morning/afternoon/night");
+    await fetch(API+`/reserve?uid=${uid}&cid=${cid}&date=${date}&slot=${slot}`, {method:"POST"});
+    alert("预约成功");
+    show("my");
+}
+
+async function my() {
+    let rs = await (await fetch(API+`/reserve/my?uid=${uid}`)).json();
+    let html = `<h3>我的预约</h3>`;
+    rs.forEach(r => {
+        html += `
+        <div class="card">
+            ${r.date} ${r.time_slot} | ${r.status}
+            <button onclick="cancel(${r.id})">取消</button>
+        </div>`;
+    });
+    app.innerHTML = html;
+}
+
+async function cancel(id) {
+    await fetch(API+`/reserve/cancel?id=${id}`, {method:"POST"});
+    alert("已取消"); my();
+}
+
+function show(p) {
+    if (p === "book") loadRooms();
+    if (p === "my") my();
+}
+function logout() { localStorage.clear(); location.href = "login.html"; }
+show("book");
+</script>
